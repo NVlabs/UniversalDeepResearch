@@ -23,6 +23,14 @@ As mentioned above, this is a research demonstration prototype and should not be
 
 ## Getting Started
 
+### Nebius AI Studio quickstart (OpenAI-compatible)
+
+- Set NEBIUS_API_KEY in backend/.env and choose DEFAULT_MODEL=nebius-kimi-k2.
+- Use FRAME_BASE_URL=https://api.studio.nebius.com/v1/ and FRAME_MODEL=moonshotai/Kimi-K2-Instruct.
+- Frontend: NEXT_PUBLIC_API_VERSION=v1, NEXT_PUBLIC_ENABLE_V2_API=false, DRY_RUN=true (no Tavily) or false (with Tavily).
+- See Nebius AI Studio Cookbook for more examples: https://github.com/nebius/ai-studio-cookbook
+
+
 To run the prototype, you need to start both the backend and frontend services:
 
 ### 1. Backend Setup
