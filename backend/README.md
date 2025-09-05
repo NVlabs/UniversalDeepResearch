@@ -404,3 +404,31 @@ For issues and questions:
 - Create an issue in the repository
 - Check the logs in the `logs/` directory
 - Review the configuration settings
+
+### Nebius AI Studio (OpenAI-compatible)
+
+To run the v1 endpoint with Nebius as the default LLM:
+
+1) Copy env and set CORS to your frontend port (e.g., 3004):
+
+```bash
+cp env.example .env
+sed -i '' 's#^FRONTEND_URL=.*#FRONTEND_URL=http://localhost:3004#' .env
+```
+
+2) Set Nebius defaults and provide the key (no quotes):
+
+```bash
+sed -i '' 's#^DEFAULT_MODEL=.*#DEFAULT_MODEL=nebius-kimi-k2#' .env
+# NEBIUS_API_KEY=your-nebius-api-key
+# FRAME_BASE_URL=https://api.studio.nebius.com/v1/
+# FRAME_MODEL=moonshotai/Kimi-K2-Instruct
+```
+
+3) Start:
+
+```bash
+./launch_server.sh
+```
+
+Notes: Tavily search optional via tavily_api.txt.
