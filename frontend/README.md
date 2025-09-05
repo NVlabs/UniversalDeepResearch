@@ -169,3 +169,17 @@ The application can be deployed to any platform that supports Next.js:
 This software is provided for research and demonstration purposes only. Please refer to the [DISCLAIMER](DISCLAIMER.txt) file for complete terms and conditions regarding the use of this software. You can find the license in [LICENSE](LICENSE.txt).
 
 **Do not use this code in production.**
+
+### Using Nebius AI Studio (OpenAI-compatible)
+
+Local dev with Nebius v1:
+
+```bash
+cp env.example .env.local
+sed -i '' 's#^NEXT_PUBLIC_API_VERSION=.*#NEXT_PUBLIC_API_VERSION=v1#' .env.local
+sed -i '' 's#^NEXT_PUBLIC_ENABLE_V2_API=.*#NEXT_PUBLIC_ENABLE_V2_API=false#' .env.local
+sed -i '' 's#^NEXT_PUBLIC_DRY_RUN=.*#NEXT_PUBLIC_DRY_RUN=false#' .env.local
+npm run dev -- -p 3004
+```
+
+Backend must be configured with `DEFAULT_MODEL=nebius-kimi-k2` and `NEBIUS_API_KEY` in `backend/.env`.
