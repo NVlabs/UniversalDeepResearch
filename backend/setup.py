@@ -90,8 +90,8 @@ HOST=0.0.0.0
 PORT=8000
 LOG_LEVEL=info
 FRONTEND_URL=http://localhost:3000
-DEFAULT_MODEL=llama-3.1-nemotron-253b
-LLM_API_KEY_FILE=nvdev_api.txt
+DEFAULT_MODEL=moonshotai/kimi-k2-instruct-0905
+LLM_API_KEY_FILE=groq_api.txt
 TAVILY_API_KEY_FILE=tavily_api.txt
 MAX_TOPICS=1
 MAX_SEARCH_PHRASES=1
@@ -108,7 +108,7 @@ def check_api_keys():
     """Check for required API key files."""
     print_step("Checking API key files...")
 
-    required_files = ["nvdev_api.txt", "tavily_api.txt"]
+    required_files = ["groq_api.txt", "tavily_api.txt"]
 
     missing_files = []
     for file in required_files:

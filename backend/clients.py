@@ -32,7 +32,7 @@ from config import get_config
 config = get_config()
 
 # Configuration system
-ApiType = Literal["nvdev", "openai", "tavily"]
+ApiType = Literal["nvdev", "openai", "tavily", "groq"]
 
 
 class ModelConfig(TypedDict):
@@ -76,6 +76,17 @@ MODEL_CONFIGS: Dict[str, ModelConfig] = {
             "stream": True,
         },
     },
+    "moonshotai/kimi-k2-instruct-0905": {
+        "base_url": "https://api.groq.com/openai/v1",
+        "api_type": "groq",
+        "completion_config": {
+            "model": "moonshotai/kimi-k2-instruct-0905",
+            "temperature": 0.2,
+            "top_p": 0.7,
+            "max_tokens": 2048,
+            "stream": True,
+        },
+    },
 }
 
 # Default model to use (from configuration)
@@ -107,6 +118,7 @@ def get_api_key(api_type: ApiType) -> str:
         "nvdev": config.model.api_key_file,
         "openai": "openai_api.txt",
         "tavily": config.search.tavily_api_key_file,
+        "groq": "groq_api.txt",
     }
 
     key_file = api_key_files.get(api_type)

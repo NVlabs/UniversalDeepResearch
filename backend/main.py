@@ -380,9 +380,15 @@ async def stream_research2_events(
             comm_trace_filename, copy_into_stdout=config.logging.copy_into_stdout
         )
 
+        # Get the configured model settings
+        from clients import MODEL_CONFIGS, DEFAULT_MODEL, get_api_key
+        model_config = MODEL_CONFIGS[DEFAULT_MODEL]
+        api_key = get_api_key(model_config["api_type"])
+        
         client: Client = OpenAIClient(
-            base_url="https://integrate.api.nvidia.com/v1",
-            model="nvdev/meta/llama-3.1-70b-instruct",
+            base_url=model_config["base_url"],
+            model=model_config["completion_config"]["model"],
+            api_key=api_key,
             trace=comm_trace,
         )
 

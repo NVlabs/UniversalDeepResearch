@@ -28,7 +28,32 @@ def perform_search(search_phrase: str):
 
     """
     from tavily import TavilyClient
-
-    client = TavilyClient(api_key="tvly-dev-XXXX")
+    import os
+    
+    # Try to get API key from multiple sources
+    api_key = None
+    
+    # Method 1: Try environment variable
+    api_key = os.getenv('TAVILY_API_KEY')
+    
+    # Method 2: Try reading from file in current directory
+    if not api_key:
+        try:
+            with open("tavily_api.txt", "r") as f:
+                api_key = f.read().strip()
+        except FileNotFoundError:
+            pass
+    
+    # Method 3: Try reading from backend directory
+    if not api_key:
+        try:
+            backend_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..")
+            api_key_path = os.path.join(backend_path, "tavily_api.txt")
+            with open(api_key_path, "r") as f:
+                api_key = f.read().strip()
+        except FileNotFoundError:
+            pass
+    
+    client = TavilyClient(api_key=api_key)
     search_response = client.search(search_phrase, include_raw_content=True)
     return search_response["results"]

@@ -178,12 +178,24 @@ class OpenAIClient(Client):
         }
 
         merged_settings = {**default_settings, **completion_config}
-        # go through the messages; if the role="ipython" rename it to "function"
+        
+        # Clean up messages for Groq compatibility
+        cleaned_messages = []
         for message in messages:
+            # Skip empty system messages (Groq doesn't accept null/empty content)
+            if message["role"] == "system" and (not message.get("content") or message["content"].strip() == ""):
+                continue
+            # Rename ipython role to function for compatibility
             if message["role"] == "ipython":
                 message["role"] = "function"
+            cleaned_messages.append(message)
+        
+        # Ensure we have at least one message
+        if not cleaned_messages:
+            cleaned_messages = [{"role": "user", "content": "Hello"}]
+            
         completion = self.client.chat.completions.create(
-            messages=messages, **merged_settings
+            messages=cleaned_messages, **merged_settings
         )
 
         ret: str = ""
@@ -196,11 +208,14 @@ class OpenAIClient(Client):
     def run(self, pre_prompt: str, prompt: str, completion_config: dict = {}) -> str:
         super().run(pre_prompt, prompt, completion_config)
 
+        # Build messages, handling empty pre_prompt for Groq compatibility
+        messages = []
+        if pre_prompt and pre_prompt.strip():
+            messages.append({"role": "system", "content": pre_prompt})
+        messages.append({"role": "user", "content": prompt})
+
         ret = self._invoke(
-            messages=[
-                {"role": "system", "content": pre_prompt},
-                {"role": "user", "content": prompt},
-            ],
+            messages=messages,
             completion_config=completion_config,
         )
 

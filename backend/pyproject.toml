@@ -1,0 +1,110 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+
+[project]
+name = "universal-deep-research-backend"
+version = "0.1.0"
+description = "A FastAPI-based backend service that provides intelligent research and reporting capabilities using large language models and web search APIs"
+readme = "README.md"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "NVIDIA CORPORATION & AFFILIATES"},
+]
+requires-python = ">=3.8.1"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
+]
+keywords = ["research", "ai", "llm", "fastapi", "web-search", "automation"]
+
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "python-dotenv",
+    "attr",
+    "datasets",
+    "docstring_parser",
+    "evaluate",
+    "openai==1.65.1",
+    "transformers",
+    "tavily-python",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "black",
+    "flake8>=5.0.0,<6.0.0",
+    "mypy",
+]
+production = [
+    "gunicorn",
+]
+
+[project.urls]
+Homepage = "https://github.com/NVIDIA/UniversalDeepResearch"
+Documentation = "https://github.com/NVIDIA/UniversalDeepResearch/blob/main/backend/README.md"
+Repository = "https://github.com/NVIDIA/UniversalDeepResearch"
+Issues = "https://github.com/NVIDIA/UniversalDeepResearch/issues"
+
+[project.scripts]
+udr-backend = "main:app"
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.0.0",
+    "flake8>=5.0.0",
+    "mypy>=1.0.0",
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = [
+    "tavily.*",
+    "datasets.*",
+    "transformers.*",
+    "evaluate.*",
+]
+ignore_missing_imports = true
+

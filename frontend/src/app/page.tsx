@@ -429,7 +429,7 @@ export default function Home() {
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="row-start-2 flex flex-col items-center justify-center gap-8 w-full">
         <div className="w-[min(90%,max(200pt,40%))] min-w-[30rem] flex flex-col items-center justify-center gap-8">
-          <h1 className="text-4xl font-bold">NVR Universal Deep Research</h1>
+          <h1 className="text-4xl font-bold">Groq's Universal Deep Research</h1>
           <PromptBar
             onResearch={handleStartResearch}
             onEditStrategy={handleStartEditingStrategy}

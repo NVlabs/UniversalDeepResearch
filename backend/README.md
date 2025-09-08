@@ -35,15 +35,19 @@ The backend consists of several key components:
 
 ### Prerequisites
 
-- Python 3.8+
-- API keys for your chosen LLM provider
+- Python 3.8.1+
+- **Choose one package manager:**
+  - [uv](https://docs.astral.sh/uv/) - Fast Python package installer and resolver (recommended)
+  - [Hermit](https://github.com/cashapp/hermit) - Reproducible development environments
+  - pip - Traditional Python package installer
+- API keys for your chosen LLM provider (Groq, OpenAI, or NVIDIA)
 - Tavily API key for web search functionality
 
 ### Installation
 
-#### Option 1: Automated Setup (Recommended)
+#### Option 1: uv Setup (Recommended)
 
-The easiest way to set up the backend is using the provided `setup.py` script:
+The fastest way to set up the backend is using uv:
 
 1. **Clone the repository**:
 
@@ -52,43 +56,120 @@ The easiest way to set up the backend is using the provided `setup.py` script:
    cd backend
    ```
 
-2. **Run the setup script**:
+2. **Install dependencies with uv**:
 
    ```bash
-   python3 setup.py
+   uv pip install -e .
    ```
 
-   The setup script will:
+   This will:
+   - Automatically create a virtual environment
+   - Install all dependencies from `pyproject.toml`
+   - Set up the project in editable mode
 
-   - Check Python version compatibility
-   - Create necessary directories (`logs/`, `instances/`, `mock_instances/`)
-   - Set up environment configuration (`.env` file)
-   - Check for required API key files
-   - Install Python dependencies
-   - Validate the setup
+3. **Create necessary directories**:
 
-3. **Configure API keys**:
+   ```bash
+   mkdir -p logs instances mock_instances
+   ```
+
+4. **Set up environment configuration**:
+
+   ```bash
+   cp env.example .env
+   # Edit .env file with your configuration
+   ```
+
+5. **Configure API keys**:
    Create the following files with your API keys:
 
    ```bash
    echo "your-tavily-api-key" > tavily_api.txt
-   echo "your-llm-api-key" > nvdev_api.txt  # or openai_api.txt
+   echo "your-groq-api-key" > groq_api.txt     # For Groq (recommended)
+   echo "your-nvidia-api-key" > nvdev_api.txt  # For NVIDIA
+   echo "your-openai-api-key" > openai_api.txt # For OpenAI
    ```
 
-4. **Start the server**:
+6. **Start the server**:
+
+   ```bash
+   uv run uvicorn main:app --reload
+   ```
+
+   Or use the launch script:
 
    ```bash
    ./launch_server.sh
    ```
 
-   **Note**: The `launch_server.sh` script is the recommended way to start the server as it:
+#### Option 2: Hermit Setup (Reproducible Environment)
 
-   - Automatically loads environment variables from `.env`
-   - Sets proper default configurations
-   - Runs the server in the background with logging
-   - Provides process management information
+Hermit provides reproducible development environments with automatic tool management:
 
-#### Option 2: Manual Setup
+1. **Clone the repository**:
+
+   ```bash
+   git clone <repository-url>
+   cd backend
+   ```
+
+2. **Activate Hermit environment**:
+
+   ```bash
+   # For bash/zsh users:
+   source bin/activate-hermit
+   
+   # For fish shell users:
+   source bin/activate-hermit.fish
+   
+   # Or add to your shell profile for automatic activation:
+   echo 'source bin/activate-hermit' >> ~/.bashrc  # or ~/.zshrc
+   ```
+
+   This will:
+   - Automatically install and manage Python and other tools
+   - Create an isolated environment for this project
+   - Ensure reproducible builds across different machines
+
+3. **Install Python dependencies**:
+
+   ```bash
+   pip install -r requirements.txt
+   # Or if you have uv available in Hermit:
+   uv pip install -e .
+   ```
+
+4. **Create necessary directories**:
+
+   ```bash
+   mkdir -p logs instances mock_instances
+   ```
+
+5. **Set up environment configuration**:
+
+   ```bash
+   cp env.example .env
+   # Edit .env file with your configuration
+   ```
+
+6. **Configure API keys**:
+
+   ```bash
+   echo "your-tavily-api-key" > tavily_api.txt
+   echo "your-groq-api-key" > groq_api.txt     # For Groq (recommended)
+   echo "your-nvidia-api-key" > nvdev_api.txt  # For NVIDIA
+   echo "your-openai-api-key" > openai_api.txt # For OpenAI
+   ```
+
+7. **Start the server**:
+
+   ```bash
+   uvicorn main:app --reload
+   # Or use the launch script:
+   ./launch_server.sh
+   ```
+
+#### Option 3: Manual Setup
 
 If you prefer to set up the backend manually, follow these steps:
 
@@ -99,15 +180,30 @@ If you prefer to set up the backend manually, follow these steps:
    cd backend
    ```
 
-2. **Create virtual environment**:
+2. **Create virtual environment** (choose one):
 
+   With uv:
+   ```bash
+   uv venv
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   ```
+
+   With pip:
    ```bash
    python3 -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
-3. **Install dependencies**:
+3. **Install dependencies** (choose one):
 
+   With uv:
+   ```bash
+   uv pip install -r requirements.txt
+   # Or install from pyproject.toml:
+   uv pip install -e .
+   ```
+
+   With pip:
    ```bash
    pip install -r requirements.txt
    ```
@@ -175,10 +271,15 @@ LOG_LEVEL=info
 # CORS Configuration
 FRONTEND_URL=http://localhost:3000
 
-# Model Configuration
-DEFAULT_MODEL=llama-3.1-nemotron-253b
-LLM_BASE_URL=https://integrate.api.nvidia.com/v1
-LLM_API_KEY_FILE=nvdev_api.txt
+# Model Configuration - Using Groq (recommended)
+DEFAULT_MODEL=moonshotai/kimi-k2-instruct-0905
+LLM_BASE_URL=https://api.groq.com/openai/v1
+LLM_API_KEY_FILE=groq_api.txt
+
+# Alternative: NVIDIA
+# DEFAULT_MODEL=llama-3.1-nemotron-253b
+# LLM_BASE_URL=https://integrate.api.nvidia.com/v1
+# LLM_API_KEY_FILE=nvdev_api.txt
 
 # Search Configuration
 TAVILY_API_KEY_FILE=tavily_api.txt
@@ -218,9 +319,10 @@ MODEL_CONFIGS = {
 
 The system expects API keys in text files:
 
-- `tavily_api.txt`: Tavily search API key
-- `nvdev_api.txt`: NVIDIA API key
-- `openai_api.txt`: OpenAI API key
+- `tavily_api.txt`: Tavily search API key (required)
+- `groq_api.txt`: Groq API key (recommended for fast inference)
+- `nvdev_api.txt`: NVIDIA API key (alternative)
+- `openai_api.txt`: OpenAI API key (alternative)
 
 ## API Endpoints
 
@@ -306,6 +408,49 @@ curl -X POST http://localhost:8000/api/research \
 
 ## Development
 
+### Environment Management
+
+#### Hermit Environment
+
+If you're using Hermit, you can manage your development environment with these commands:
+
+```bash
+# Activate Hermit environment (run from backend directory)
+source bin/activate-hermit
+
+# Check Hermit status
+hermit status
+
+# List available packages
+hermit search
+
+# Install additional packages (if needed)
+hermit install <package-name>
+
+# Deactivate Hermit environment
+deactivate
+```
+
+**Hermit Benefits:**
+- **Reproducible**: Same tool versions across all developers and CI/CD
+- **Isolated**: No conflicts with system-installed tools
+- **Automatic**: Tools are installed on-demand when needed
+- **Cross-platform**: Works on macOS, Linux, and Windows (WSL)
+
+**Shell Integration:**
+Add this to your shell profile for automatic activation:
+
+```bash
+# For bash users (~/.bashrc)
+echo 'source bin/activate-hermit' >> ~/.bashrc
+
+# For zsh users (~/.zshrc) 
+echo 'source bin/activate-hermit' >> ~/.zshrc
+
+# For fish users (~/.config/fish/config.fish)
+echo 'source bin/activate-hermit.fish' >> ~/.config/fish/config.fish
+```
+
 ### Logging
 
 Logs are stored in the `logs/` directory:
@@ -333,14 +478,21 @@ Mock research data is available in `mock_instances/`:
    export LOG_LEVEL=info
    ```
 
-2. **Run with gunicorn**:
+2. **Run with gunicorn** (choose one):
 
+   With uv:
+   ```bash
+   uv pip install gunicorn
+   uv run gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
+   ```
+
+   With pip:
    ```bash
    pip install gunicorn
    gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
    ```
 
-   **Note**: For development, prefer using `./launch_server.sh` which provides better process management and logging.
+   **Note**: For development, prefer using `uv run uvicorn main:app --reload` or `./launch_server.sh`.
 
 ### Docker Deployment
 
@@ -349,14 +501,24 @@ Create a `Dockerfile`:
 ```dockerfile
 FROM python:3.9-slim
 
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
+WORKDIR /app
+
+# Copy dependency files
+COPY pyproject.toml uv.lock ./
+COPY requirements.txt ./
+
+# Install dependencies
+RUN uv pip install --system -r requirements.txt
+
+# Copy application code
 COPY . .
+
 EXPOSE 8000
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uv", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
 ## Troubleshooting
@@ -367,6 +529,11 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 2. **CORS Errors**: Check `FRONTEND_URL` configuration
 3. **Model Errors**: Verify model configuration in `clients.py`
 4. **Permission Errors**: Ensure write permissions for `logs/` and `instances/` directories
+5. **Hermit Issues**: 
+   - If Hermit activation fails, ensure you're in the backend directory
+   - Run `hermit status` to check environment state
+   - Use `hermit install` to reinstall missing packages
+   - Check that `bin/activate-hermit` has execute permissions
 
 ### Debug Mode
 
@@ -377,8 +544,14 @@ export LOG_LEVEL=debug
 ./launch_server.sh
 ```
 
-Or run uvicorn directly for debugging:
+Or run uvicorn directly for debugging (choose one):
 
+With uv:
+```bash
+uv run uvicorn main:app --reload --log-level=debug
+```
+
+With pip:
 ```bash
 uvicorn main:app --reload --log-level=debug
 ```
